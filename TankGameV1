@@ -1,0 +1,274 @@
+import os
+
+#Game Stats:
+rounds = 1
+
+#Player Stats:
+health = 100
+money = 0
+kills = 0
+player_position = 0
+
+#Upgrades:
+radar_lvl = 1
+radar_cost = 1
+
+gun_lvl = 1
+gun_cost = 1
+
+speed_lvl = 1
+speed_cost = 1
+
+#Enemy Stats:
+enemy_health = 0
+enemy_distance = 0
+enemy_position = 0
+enemy_type = 'currently_undefined'
+
+#Actions:
+available_movement = 1
+
+#Player Position Strings
+player_position_list = [
+        """|                      _^_                      |
+        |_____________________|___|_____________________|""",
+        """|                        _^_                    |
+        |_______________________|___|___________________|""",
+        """|                          _^_                  |
+        |_________________________|___|_________________|""",
+        """|                            _^_                |
+        |___________________________|___|_______________|""",
+        """|                              _^_              |
+        |_____________________________|___|_____________|""",
+        """|                                _^_            |
+        |_______________________________|___|___________|""",
+        """|                                  _^_          |
+        |_________________________________|___|_________|""",
+        """|                                    _^_        |
+        |___________________________________|___|_______|""",
+        """|                                      _^_      |
+        |_____________________________________|___|_____|""",
+        """|                                        _^_    |
+        |_______________________________________|___|___|""",
+        """|                                          _^_  |
+        |_________________________________________|___|_|""",
+        """|                    _^_                        |
+        |___________________|___|_______________________|""",
+        """|                  _^_                          |
+        |_________________|___|_________________________|""",
+        """|                _^_                            |
+        |_______________|___|___________________________|""",
+        """|              _^_                              |
+        |_____________|___|_____________________________|""",
+        """|            _^_                                |
+        |___________|___|_______________________________|""",
+        """|          _^_                                  |
+        |_________|___|_________________________________|""",
+        """|        _^_                                    |
+        |_______|___|___________________________________|""",
+        """|      _^_                                      |
+        |_____|___|_____________________________________|""",
+        """|    _^_                                        |
+        |___|___|_______________________________________|""",
+        """|  _^_                                          |
+        |_|___|_________________________________________|"""
+    ]
+
+#Possible Player Positions:
+def gamestate_intermission(rounds, radar_lvl, radar_cost, gun_lvl, gun_cost, speed_lvl, speed_cost, health, money, kills):
+    return f"""
+                             ROUND {rounds}
+                         [INTERMISSION]
+         _______________________________________________         _______________
+        |                                               |       |               |
+        |                                               |       | HEADQUARTERS: |
+        |                                               |       |_______________|
+        |                                               |
+        |                                               |        *NO CURRENT ENEMIES,
+        |> - - - - - - - - - - - - - - - - - - - - - - <|> [4]    GOOD LUCK OPERATOR*
+        |                                               |        _______________
+        |                                               |       |               |
+        |                                               |       |   UPGRADES:   |
+        |                                               |       |_______________|
+        |                                               |
+        |> - - - - - - - - - - - - - - - - - - - - - - <|> [3]   RADAR | LVL {radar_lvl}
+        |                                               |        UPGRADE COST: ${radar_cost}
+        |                                               |
+        |                                               |        GUN | LVL {gun_lvl}
+        |                                               |        UPGRADE COST: ${gun_cost}
+        |                                               |
+        |> - - - - - - - - - - - - - - - - - - - - - - <|> [2]   SPEED | LVL {speed_lvl}
+        |                                               |        UPGRADE COST: ${speed_cost}
+        |                                               |
+        |                                               |
+        |                                               |
+        |                                               |
+        |> - - - - - - - - - - - - - - - - - - - - - - <|> [1]
+        |                                               |
+        |                                               |
+        |                                               |
+        {player_position_list[0]}
+            | ' ' ' ' | ' ' ' ' | ' ' ' ' | ' ' ' ' |
+          [-10]      [-5]      [0]       [5]       [10]
+         _____________
+        |             |
+        |PLAYER STATS:|
+        |_____________|
+
+         HEALTH: {health}
+         MONEY: {money}
+         KILLS: {kills}
+         _____________
+        |             |
+        |  ACTIONS:   |
+        |_____________|
+
+         START ROUND | [s] key
+
+         UPGRADE | [u] key
+      """
+def gamestate(player_position_list, player_position, enemy_type, enemy_health, enemy_distance, rounds, radar_lvl, radar_cost, gun_lvl, gun_cost, speed_lvl, speed_cost, health, money, kills, available_movement):
+    return f"""
+                             ROUND {rounds}
+         _______________________________________________         _______________
+        |                                               |       |               |
+        |                                               |       | HEADQUARTERS: |
+        |                                               |       |_______________|
+        |                                               |
+        |                                               |        *ATTENTION OPERATOR, AN ENEMY
+        |> - - - - - - - - - - - - - - - - - - - - - - <|> [4]    {enemy_type} IS APPROACHING!*
+        |                                               |        _______________
+        |                                               |       |               |
+        |                                               |       |  ENEMY STATS: |
+        |                                               |       |_______________|
+        |                                               |
+        |> - - - - - - - - - - - - - - - - - - - - - - <|> [3]   HEALTH: {enemy_health}
+        |                                               |        DISTANCE: {enemy_distance}
+        |                                               |        POSITION: {enemy_position}
+        |                                               |        _______________
+        |                                               |       |               |
+        |                                               |       |   UPGRADES:   |
+        |> - - - - - - - - - - - - - - - - - - - - - - <|> [2]  |_______________|
+        |                                               |
+        |                                               |        RADAR | LVL {radar_lvl}
+        |                                               |        UPGRADE COST: ${radar_cost}
+        |                                               |
+        |                                               |        GUN | LVL {gun_lvl}
+        |> - - - - - - - - - - - - - - - - - - - - - - <|> [1]   UPGRADE COST: ${gun_cost}
+        |                                               |
+        |                                               |        SPEED | LVL {speed_lvl}
+        |                                               |        UPGRADE COST: ${speed_cost}
+        {player_position_list[player_position]}
+            | ' ' ' ' | ' ' ' ' | ' ' ' ' | ' ' ' ' |
+          [-10]      [-5]      [0]       [5]       [10]
+         _____________
+        |             |
+        |PLAYER STATS:|
+        |_____________|
+
+         HEALTH: {health}
+         MONEY: {money}
+         KILLS: {kills}
+         _____________
+        |             |
+        |  ACTIONS:   |
+        |_____________|
+
+         MOVE | [m] key + [movement value]
+         MAX {available_movement} or {-available_movement} steps
+         
+         FIRE | [f] key
+
+         UPGRADE | [u] key
+      """
+
+print(gamestate_intermission(rounds, radar_lvl, radar_cost, gun_lvl, gun_cost, speed_lvl, speed_cost, health, money, kills))
+valid_action_1 = ['s']
+action_1 = input()
+while action_1 not in valid_action_1:
+    if action_1 == 'u':
+        print('''
+        No money to upgrade yet.
+        Please start game.
+        ''')
+        action_1 = input()
+    else:
+        print('''
+        Action not recognized.
+        Please retry.
+        ''')
+        action_1 = input()
+if action_1 == 's':
+    os.system('cls')
+    enemy_distance = 2
+    enemy_health = 3
+    enemy_position = 1
+    enemy_type = 'HELICOPTER'
+    gamestate = gamestate(player_position_list, player_position, enemy_type, enemy_health, enemy_distance, rounds, radar_lvl, radar_cost, gun_lvl, gun_cost, speed_lvl, speed_cost, health, money, kills, available_movement)
+    print(gamestate)
+action_2 = input()
+if action_2 == 'm + 1':
+    os.system('cls')
+    player_position += 8
+    print(gamestate)
+    print(player_position)
+    print(player_position_list[player_position])
+'''
+    if player_position == 0:
+        print(position_0_gamestate)
+    if player_position == 1:
+        print(position_1)
+    if player_position == 2:
+        print(position_2)
+    if player_position == 3:
+        print(position_3)
+    if player_position == 4:
+        print(position_4)
+    if player_position == 5:
+        print(position_5)
+    if player_position == 6:
+        print(position_6)
+    if player_position == 7:
+        print(position_7)
+    if player_position == 8:
+        print(position_8)
+    if player_position == 9:
+        print(position_9)
+    if player_position == 10:
+        print(position_10)
+    if player_position == -1:
+        print(position_n1)
+    if player_position == -2:
+        print(position_n2)
+    if player_position == -3:
+        print(position_n3)
+    if player_position == -4:
+        print(position_n4)
+    if player_position == -5:
+        print(position_n5)
+    if player_position == -6:
+        print(position_n6)
+    if player_position == -7:
+        print(position_n7)
+    if player_position == -8:
+        print(position_n8)
+    if player_position == -9:
+        print(position_n9)
+    if player_position == -10:
+        print(position_n10)
+
+else:
+    print("""
+    ERROR: Action not recognized/unlocked
+    
+    Please restart
+    """)
+    quit()
+'''
+if action_1 == 'f':
+    os.system('cls')
+    print()
+if action_1 == 'u':
+    os.system('cls')
+    print()
+
